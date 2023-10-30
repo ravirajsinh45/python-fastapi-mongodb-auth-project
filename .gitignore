@@ -3,9 +3,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+mongodb_data
+
 # C extensions
 *.so
-
+test
 # Distribution / packaging
 .Python
 build/
