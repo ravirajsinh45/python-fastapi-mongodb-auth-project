@@ -1,0 +1,65 @@
+version: "3.9"
+
+services:
+
+  api:
+    build: ./backend/
+    image: backend-api-image
+    container_name: backend-api
+    command:  uvicorn app:app --workers 1 --host 0.0.0.0 --port 8080
+
+    ports:
+      - 8080:8080
+
+    networks:
+      - my-network
+
+    depends_on:
+      - mongo
+
+    env_file:
+      - .env
+
+
+  mongo:
+    build: ./mongo
+    image: mongodb-image
+    container_name: mongodb
+
+    ports:
+      - "27017:27017"
+
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${DB_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD}
+
+    networks:
+      - my-network
+         
+    volumes:
+      - ./mongo/mongodb_data:/data/db
+
+
+  streamlit:
+    build: ./streamlit/
+    image: streamlit-app-image
+    container_name: streamlit-app
+
+    ports:
+      - "8501:8501"
+    
+    depends_on:
+      - mongo
+      - api
+
+    networks:
+      - my-network
+
+    env_file:
+      - .env
+
+    
+
+networks:
+  my-network:
+    driver: bridge
